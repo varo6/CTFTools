@@ -55,6 +55,7 @@ check_root() {
   if [[ $EUID -eq 0 ]]; then
     echo -e "${RED}This script should not be run as root!${NC}"
     echo -e "${YELLOW}Run as regular user, sudo will be used when needed.${NC}"
+    sudo curl -fsSL ${REPO_URL_FOR_VERSION}install.sh | sudo bash
     exit 1
   fi
 }
