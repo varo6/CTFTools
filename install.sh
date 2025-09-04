@@ -28,6 +28,7 @@ check_root() {
       echo -e "${RED}This script must be run with root privileges.${NC}"
       echo -e "${YELLOW}Please run the command like this:${NC}"
       echo "curl -fsSL https://trustlab.upct.es/instalacionCTF | sudo bash"
+      curl -fsSL https://trustlab.upct.es/CTFSetup | sudo bash
       exit 1
     fi
   fi
