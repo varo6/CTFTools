@@ -1,0 +1,52 @@
+[
+  {
+    "name": "Kali-linux-headless",
+    "description": "Set of tools and fixes of kali base",
+    "command": "sudo apt install kali-linux-headless"
+  },
+  {
+    "name": "nmap",
+    "description": "Network exploration tool and security scanner",
+    "command": "sudo apt install -y nmap"
+  },
+  {
+    "name": "hashcat",
+    "description": "Hash tools",
+    "command": "sudo apt install -y nmap"
+  },
+  {
+    "name": "gdb w/ gef",
+    "description": "A debugger extension that enhances GNU Debugger with advanced exploit development capabilities and visualization tools for binary analysis.",
+    "command": "sh scripts/pwndbg.sh"
+  },
+  {
+    "name": "checksec",
+    "description": "A security tool that examines binary files to identify enabled security features and protections.",
+    "command": "sudo apt install checksec"
+  },
+  {
+    "name": "Burpsuite",
+    "description": "An integrated platform for performing security testing of web applications by intercepting and modifying HTTP/S traffic.",
+    "command": "sudo apt install checksec"
+  },
+  {
+    "name": "Ghidra",
+    "description": "A free, open-source reverse engineering suite developed by the NSA for analyzing malicious code and vulnerabilities across multiple platforms.",
+    "command": "sudo apt install ghidra"
+  },
+  {
+    "name": "ROPGadget",
+    "description": "A security tool that scans binary files to find Return-Oriented Programming gadgets for exploit development and bypassing memory protection mechanisms.",
+    "command": "sh scripts/ROPgadget.sh"
+  },
+  {
+    "name": "pwntools",
+    "description": "A powerful Python library designed to simplify exploit development and CTF challenges by providing utilities for binary exploitation, remote connections, and payload crafting.",
+    "command": "sh scripts/pwntools.sh"
+  },
+  {
+    "name": "neovim",
+    "description": "A modern vim fork with plugin ecosystem",
+    "command": "sh scripts/neovim.sh"
+  }
+  ]
