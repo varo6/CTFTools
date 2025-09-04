@@ -15,6 +15,7 @@ AUTOSETUP_SCRIPT_URL="$REPO_URL/setup.sh"
 APPS_JSON_URL="$REPO_URL/apps.json"
 INSTALL_PATH="/usr/local/bin/autosetup"
 APPS_JSON_PATH="$AUTOSETUP_DIR/apps.json"
+SCRIPTS_DIR="$AUTOSETUP_DIR/scripts"
 
 # Check if running as root, if not, re-run with sudo or exit
 check_root() {
@@ -63,12 +64,28 @@ download_files() {
   fi
 }
 
+# Download scripts
+download_scripts() {
+  echo -e "${YELLOW}Downloading scripts...${NC}"
+  mkdir -p "$SCRIPTS_DIR"
+  # Download each script individually
+  for script in gef.sh neovim.sh pwndbg.sh pwntools.sh ROPgadget.sh; do
+    echo "Downloading $script..."
+    curl -fsSL "$REPO_URL/scripts/$script" -o "$SCRIPTS_DIR/$script"
+    if [[ $? -ne 0 ]]; then
+      echo -e "${RED}Failed to download $script.${NC}"
+      exit 1
+    fi
+    chmod +x "$SCRIPTS_DIR/$script"
+  done
+}
+
 # Modify and install autosetup script
 install_script() {
   echo -e "${YELLOW}Installing autosetup script to $INSTALL_PATH...${NC}"
 
   # Modify the script to use the new apps.json path
-  sed 's|local json_file="apps.json"|local json_file="'"$APPS_JSON_PATH"'"|' "/tmp/autosetup_temp" >"$INSTALL_PATH"
+  sed 's|local json_file="apps.json"|local json_file="'"$APPS_JSON_PATH"'"|' "/tmp/autosetup_temp" > "$INSTALL_PATH"
 
   if [[ $? -ne 0 ]]; then
     echo -e "${RED}Failed to modify and install the script.${NC}"
@@ -82,6 +99,13 @@ install_script() {
   fi
 
   rm "/tmp/autosetup_temp"
+
+  # Modify the apps.json to use the new scripts path
+  sed -i "s|sh scripts/|sh $SCRIPTS_DIR/|g" "$APPS_JSON_PATH"
+  if [[ $? -ne 0 ]]; then
+    echo -e "${RED}Failed to modify the apps.json.${NC}"
+    exit 1
+  fi
 }
 
 # Main function
@@ -89,6 +113,7 @@ main() {
   check_root
   create_dir
   download_files
+  download_scripts
   install_script
 
   echo -e "${GREEN}autosetup installed successfully!${NC}"

@@ -11,7 +11,7 @@ MAGENTA='\033[0;35m'
 NC='\033[0m' # No Color
 
 # Version checking
-CURRENT_VERSION="1.0.0"
+CURRENT_VERSION="1.0.1"
 REPO_URL_FOR_VERSION="https://raw.githubusercontent.com/varo6/CTFTools/refs/heads/main/"
 
 check_for_updates() {
