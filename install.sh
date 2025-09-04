@@ -16,11 +16,20 @@ APPS_JSON_URL="$REPO_URL/apps.json"
 INSTALL_PATH="/usr/local/bin/autosetup"
 APPS_JSON_PATH="$AUTOSETUP_DIR/apps.json"
 
-# Check if running as root, if not, re-run with sudo
+# Check if running as root, if not, re-run with sudo or exit
 check_root() {
   if [[ $EUID -ne 0 ]]; then
-    echo -e "${YELLOW}This script needs root privileges. Re-running with sudo...${NC}"
-    exec sudo "$0" "$@"
+    if [ -t 0 ]; then
+      # Script is run directly
+      echo -e "${YELLOW}This script needs root privileges. Re-running with sudo...${NC}"
+      exec sudo "$0" "$@"
+    else
+      # Script is piped
+      echo -e "${RED}This script must be run with root privileges.${NC}"
+      echo -e "${YELLOW}Please run the command like this:${NC}"
+      echo "curl -fsSL https://trustlab.upct.es/instalacionCTF | sudo bash"
+      exit 1
+    fi
   fi
 }
 
