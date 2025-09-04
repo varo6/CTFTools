@@ -17,7 +17,7 @@
   {
     "name": "gdb w/ gef",
     "description": "A debugger extension that enhances GNU Debugger with advanced exploit development capabilities and visualization tools for binary analysis.",
-    "command": "sh scripts/pwndbg.sh"
+    "command": "sh $SCRIPTS_DIR/pwndbg.sh"
   },
   {
     "name": "checksec",
@@ -37,16 +37,16 @@
   {
     "name": "ROPGadget",
     "description": "A security tool that scans binary files to find Return-Oriented Programming gadgets for exploit development and bypassing memory protection mechanisms.",
-    "command": "sh scripts/ROPgadget.sh"
+    "command": "sh $SCRIPTS_DIR/ROPgadget.sh"
   },
   {
     "name": "pwntools",
     "description": "A powerful Python library designed to simplify exploit development and CTF challenges by providing utilities for binary exploitation, remote connections, and payload crafting.",
-    "command": "sh scripts/pwntools.sh"
+    "command": "sh $SCRIPTS_DIR/pwntools.sh"
   },
   {
     "name": "neovim",
     "description": "A modern vim fork with plugin ecosystem",
-    "command": "sh scripts/neovim.sh"
+    "command": "sh $SCRIPTS_DIR/neovim.sh"
   }
   ]
