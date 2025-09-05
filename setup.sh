@@ -11,7 +11,7 @@ MAGENTA='\033[0;35m'
 NC='\033[0m' # No Color
 
 # Version checking
-CURRENT_VERSION="1.0.2"
+CURRENT_VERSION="1.0.3"
 REPO_URL_FOR_VERSION="https://raw.githubusercontent.com/varo6/CTFTools/refs/heads/main/"
 
 check_for_updates() {
@@ -271,11 +271,7 @@ install_selected() {
   done
   echo ""
 
-  echo -e "${YELLOW}Proceed with installation? (y/N):${NC}"
-  read -r confirm
-
-  if [[ $confirm =~ ^[Yy]$ ]]; then
-    echo ""
+  echo ""
     echo -e "${BLUE}Starting installation...${NC}"
     echo ""
 
@@ -293,9 +289,6 @@ install_selected() {
       unmark_all
       echo -e "${GREEN}Selections cleared.${NC}"
     fi
-  else
-    echo -e "${YELLOW}Installation cancelled.${NC}"
-  fi
 
   echo "Press Enter to continue..."
   read -r

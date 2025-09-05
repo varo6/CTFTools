@@ -7,3 +7,5 @@ cd pwndbg
 wget -O ~/.gdbinit-gef.py https://gef.blah.cat/py
 
 echo "source ~/.gdbinit-gef.py" >> ~/.gdbinit
+
+source ~/.bashrc
