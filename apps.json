@@ -12,7 +12,7 @@
   {
     "name": "hashcat",
     "description": "Hash tools",
-    "command": "sudo apt install -y nmap"
+    "command": "sudo apt install -y hashcat"
   },
   {
     "name": "gdb w/ gef",
