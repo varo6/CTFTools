@@ -111,6 +111,14 @@ install_script() {
 # Main function
 main() {
   check_root
+
+  echo -e "${YELLOW}Installing dependencies...${NC}"
+  apt install -y jq
+  if [[ $? -ne 0 ]]; then
+    echo -e "${RED}Failed to install jq. Please install it manually.${NC}"
+    exit 1
+  fi
+
   create_dir
   download_files
   download_scripts

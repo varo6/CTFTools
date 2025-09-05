@@ -67,17 +67,7 @@ update_system() {
   echo ""
 }
 
-# Check if jq is installed, install if not
-check_jq() {
-  if ! command -v jq &>/dev/null; then
-    echo -e "${YELLOW}Installing jq for JSON parsing...${NC}"
-    sudo apt install -y jq
-    if [[ $? -ne 0 ]]; then
-      echo -e "${RED}Failed to install jq. Please install it manually.${NC}"
-      exit 1
-    fi
-  fi
-}
+
 
 # Load apps from JSON file
 load_apps() {
@@ -322,7 +312,6 @@ is_valid_tool_number() {
 main() {
   check_for_updates
   check_root
-  check_jq
   load_apps
   init_selections
 
