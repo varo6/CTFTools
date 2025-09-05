@@ -101,7 +101,7 @@ install_script() {
   rm "/tmp/autosetup_temp"
 
   # Modify the apps.json to use the new scripts path
-  sed -i "s|sh scripts/|sh $SCRIPTS_DIR/|g" "$APPS_JSON_PATH"
+  sed -i "s|scripts/|$SCRIPTS_DIR/|g" "$APPS_JSON_PATH"
   if [[ $? -ne 0 ]]; then
     echo -e "${RED}Failed to modify the apps.json.${NC}"
     exit 1
