@@ -11,7 +11,7 @@ MAGENTA='\033[0;35m'
 NC='\033[0m' # No Color
 
 # Version checking
-CURRENT_VERSION="1.0.4"
+CURRENT_VERSION="1.0.5"
 REPO_URL_FOR_VERSION="https://raw.githubusercontent.com/varo6/CTFTools/refs/heads/main/"
 
 check_for_updates() {
@@ -270,23 +270,23 @@ install_selected() {
   echo ""
 
   echo ""
-    echo -e "${BLUE}Starting installation...${NC}"
-    echo ""
+  echo -e "${BLUE}Starting installation...${NC}"
+  echo ""
 
-    for i in "${!selected_tools[@]}"; do
-      install_tool "${selected_tools[i]}" "${selected_commands[i]}"
-    done
+  for i in "${!selected_tools[@]}"; do
+    install_tool "${selected_tools[i]}" "${selected_commands[i]}"
+  done
 
-    echo -e "${GREEN}Installation process completed!${NC}"
-    echo ""
+  echo -e "${GREEN}Installation process completed!${NC}"
+  echo ""
 
-    # Ask if user wants to clear selections
-    echo -e "${YELLOW}Clear all selections? (y/N):${NC}"
-    read -r clear_confirm
-    if [[ $clear_confirm =~ ^[Yy]$ ]]; then
-      unmark_all
-      echo -e "${GREEN}Selections cleared.${NC}"
-    fi
+  # Ask if user wants to clear selections
+  echo -e "${YELLOW}Clear all selections? (y/N):${NC}"
+  read -r clear_confirm
+  if [[ $clear_confirm =~ ^[Yy]$ ]]; then
+    unmark_all
+    echo -e "${GREEN}Selections cleared.${NC}"
+  fi
 
   echo "Press Enter to continue..."
   read -r

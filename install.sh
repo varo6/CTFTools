@@ -69,7 +69,7 @@ download_scripts() {
   echo -e "${YELLOW}Downloading scripts...${NC}"
   mkdir -p "$SCRIPTS_DIR"
   # Download each script individually
-  for script in gef.sh neovim.sh pwndbg.sh pwntools.sh ROPgadget.sh; do
+  for script in gef.sh neovim.sh pwndbg.sh pwntools.sh ROPgadget.sh edit.sh; do
     echo "Downloading $script..."
     curl -fsSL "$REPO_URL/scripts/$script" -o "$SCRIPTS_DIR/$script"
     if [[ $? -ne 0 ]]; then
