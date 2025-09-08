@@ -11,7 +11,7 @@ MAGENTA='\033[0;35m'
 NC='\033[0m' # No Color
 
 # Version checking
-CURRENT_VERSION="1.0.3"
+CURRENT_VERSION="1.0.4"
 REPO_URL_FOR_VERSION="https://raw.githubusercontent.com/varo6/CTFTools/refs/heads/main/"
 
 check_for_updates() {
@@ -66,8 +66,6 @@ update_system() {
   echo -e "${GREEN}Package lists updated!${NC}"
   echo ""
 }
-
-
 
 # Load apps from JSON file
 load_apps() {

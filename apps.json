@@ -48,5 +48,10 @@
     "name": "neovim",
     "description": "A modern vim fork with plugin ecosystem",
     "command": "bash scripts/neovim.sh"
+  },
+  {
+    "name":"edit (Notepad en Terminal)",
+    "description":"Editor de texto para la terminal"
+    "command": "bash scripts/edit.sh"    
   }
 ]
