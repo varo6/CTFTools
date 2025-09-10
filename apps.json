@@ -50,8 +50,13 @@
     "command": "bash scripts/neovim.sh"
   },
   {
-    "name":"edit Notepad en Terminal",
-    "description":"Editor de texto para la terminal",
-    "command": "bash scripts/edit.sh"    
+    "name": "edit Notepad en Terminal",
+    "description": "Editor de texto para la terminal",
+    "command": "bash scripts/edit.sh"
+  },
+  {
+    "name": "eza",
+    "description": "Modern replacement for ls with better features and colors",
+    "command": "sudo apt update && sudo apt install -y eza"
   }
 ]

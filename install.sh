@@ -16,6 +16,8 @@ APPS_JSON_URL="$REPO_URL/apps.json"
 INSTALL_PATH="/usr/local/bin/autosetup"
 APPS_JSON_PATH="$AUTOSETUP_DIR/apps.json"
 SCRIPTS_DIR="$AUTOSETUP_DIR/scripts"
+CORE_FUNCTIONS_DIR="$AUTOSETUP_DIR/core_functions"
+MENU_SYSTEM_DIR="$AUTOSETUP_DIR/menu_system"
 
 # Check if running as root, if not, re-run with sudo or exit
 check_root() {
@@ -80,6 +82,38 @@ download_scripts() {
   done
 }
 
+# Download core functions
+download_core_functions() {
+  echo -e "${YELLOW}Downloading core functions...${NC}"
+  mkdir -p "$CORE_FUNCTIONS_DIR"
+  # Download each core function module
+  for module in colors_utils.sh app_manager.sh installer.sh; do
+    echo "Downloading core_functions/$module..."
+    curl -fsSL "$REPO_URL/core_functions/$module" -o "$CORE_FUNCTIONS_DIR/$module"
+    if [[ $? -ne 0 ]]; then
+      echo -e "${RED}Failed to download core_functions/$module.${NC}"
+      exit 1
+    fi
+    chmod +x "$CORE_FUNCTIONS_DIR/$module"
+  done
+}
+
+# Download menu system
+download_menu_system() {
+  echo -e "${YELLOW}Downloading menu system...${NC}"
+  mkdir -p "$MENU_SYSTEM_DIR"
+  # Download each menu module
+  for module in main_menu.sh install_menu.sh; do
+    echo "Downloading menu_system/$module..."
+    curl -fsSL "$REPO_URL/menu_system/$module" -o "$MENU_SYSTEM_DIR/$module"
+    if [[ $? -ne 0 ]]; then
+      echo -e "${RED}Failed to download menu_system/$module.${NC}"
+      exit 1
+    fi
+    chmod +x "$MENU_SYSTEM_DIR/$module"
+  done
+}
+
 # Modify and install autosetup script
 install_script() {
   echo -e "${YELLOW}Installing autosetup script to $INSTALL_PATH...${NC}"
@@ -113,6 +147,12 @@ main() {
   check_root
 
   echo -e "${YELLOW}Installing dependencies...${NC}"
+  echo -e "${YELLOW}Updating package list...${NC}"
+  apt update
+  if [[ $? -ne 0 ]]; then
+    echo -e "${RED}Failed to update package list. Please check your internet connection.${NC}"
+    exit 1
+  fi
   apt install -y jq
   if [[ $? -ne 0 ]]; then
     echo -e "${RED}Failed to install jq. Please install it manually.${NC}"
@@ -122,6 +162,8 @@ main() {
   create_dir
   download_files
   download_scripts
+  download_core_functions
+  download_menu_system
   install_script
 
   echo -e "${GREEN}autosetup installed successfully!${NC}"

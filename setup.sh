@@ -1,366 +1,186 @@
 #!/bin/bash
 
-# Interactive Tool Installer for Kali Linux with JSON Configuration
-# Colors for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-CYAN='\033[0;36m'
-MAGENTA='\033[0;35m'
-NC='\033[0m' # No Color
+# CTF Tools Interactive Installer - Main Script
+# Version 1.0.6 - Modular Edition
+#
+# This is the main entry point for the CTF Tools installer.
+# It loads all modular components and starts the main menu system.
 
-# Version checking
-CURRENT_VERSION="1.0.5"
-REPO_URL_FOR_VERSION="https://raw.githubusercontent.com/varo6/CTFTools/refs/heads/main/"
+# Get the directory where this script is located
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-check_for_updates() {
-  echo -e "${YELLOW}Checking for updates...${NC}"
-  # The version file might have a newline, so we remove it
-  LATEST_VERSION=$(curl -sSL "${REPO_URL_FOR_VERSION}version" | tr -d '\n')
+# Source all core function modules
+source "$SCRIPT_DIR/core_functions/colors_utils.sh"
+source "$SCRIPT_DIR/core_functions/app_manager.sh"
+source "$SCRIPT_DIR/core_functions/installer.sh"
 
-  if [ -z "$LATEST_VERSION" ]; then
-    echo -e "${RED}Could not check for updates. Please check your internet connection.${NC}"
-    return
-  fi
+# Source all menu system modules
+source "$SCRIPT_DIR/menu_system/main_menu.sh"
+source "$SCRIPT_DIR/menu_system/install_menu.sh"
 
-  if [[ "$CURRENT_VERSION" != "$LATEST_VERSION" ]]; then
-    echo -e "${GREEN}A new version ($LATEST_VERSION) is available!${NC}"
-    echo -e "${YELLOW}Would you like to update? (y/N)${NC}"
-    read -r update_choice
-    if [[ "$update_choice" =~ ^[Yy]$ ]]; then
-      echo -e "${YELLOW}Updating...${NC}"
-      # Re-run the installer
-      curl -fsSL ${REPO_URL_FOR_VERSION}install.sh | sudo bash
-      echo -e "${GREEN}Update complete! Please restart the tool.${NC}"
-      exit 0
-    fi
-  else
-    echo -e "${GREEN}You are running the latest version.${NC}"
-  fi
-  sleep 1 # Give user time to read the message
-}
-
-# Clear screen function
-clear_screen() {
-  clear
-  echo -e "${BLUE}===============================================${NC}"
-  echo -e "${BLUE}    Kali Linux Interactive Tool Installer${NC}"
-  echo -e "${BLUE}===============================================${NC}"
-  echo ""
-}
-
-# Check if running as root
-check_root() {
-  if [[ $EUID -eq 0 ]]; then
-    echo -e "${RED}This script should not be run as root!${NC}"
-    echo -e "${YELLOW}Run as regular user, sudo will be used when needed.${NC}"
-    exit 1
-  fi
-}
-
-# Update system
-update_system() {
-  echo -e "${YELLOW}Updating package lists...${NC}"
-  sudo apt update
-  echo -e "${GREEN}Package lists updated!${NC}"
-  echo ""
-}
-
-# Load apps from JSON file
-load_apps() {
-  local json_file="apps.json"
-
-  if [[ ! -f "$json_file" ]]; then
-    echo -e "${RED}Error: $json_file not found in the current directory!${NC}"
-    exit 1
-  fi
-
-  # Check if JSON is valid
-  if ! jq empty "$json_file" 2>/dev/null; then
-    echo -e "${RED}Error: Invalid JSON format in $json_file${NC}"
-    exit 1
-  fi
-
-  # Parse JSON and populate arrays
-  mapfile -t TOOL_NAMES < <(jq -r '.[].name' "$json_file")
-  mapfile -t TOOL_DESCRIPTIONS < <(jq -r '.[].description' "$json_file")
-  mapfile -t TOOL_COMMANDS < <(jq -r '.[].command' "$json_file")
-
-  if [[ ${#TOOL_NAMES[@]} -eq 0 ]]; then
-    echo -e "${RED}Error: No tools found in $json_file${NC}"
-    exit 1
-  fi
-
-  echo -e "${GREEN}Loaded ${#TOOL_NAMES[@]} tools from $json_file${NC}"
-}
-
-# Array to track selected tools
-declare -a SELECTED_TOOLS
-
-# Initialize all tools as unselected
-init_selections() {
-  SELECTED_TOOLS=()
-  for ((i = 0; i < ${#TOOL_NAMES[@]}; i++)); do
-    SELECTED_TOOLS[i]="false"
-  done
-}
-
-# Toggle tool selection
-toggle_selection() {
-  local tool_index="$1"
-  if [[ "${SELECTED_TOOLS[$tool_index]}" == "true" ]]; then
-    SELECTED_TOOLS[$tool_index]="false"
-  else
-    SELECTED_TOOLS[$tool_index]="true"
-  fi
-}
-
-# Mark all tools
-mark_all() {
-  for ((i = 0; i < ${#TOOL_NAMES[@]}; i++)); do
-    SELECTED_TOOLS[i]="true"
-  done
-}
-
-# Unmark all tools
-unmark_all() {
-  for ((i = 0; i < ${#TOOL_NAMES[@]}; i++)); do
-    SELECTED_TOOLS[i]="false"
-  done
-}
-
-# Get checkbox symbol
-get_checkbox() {
-  local tool_index="$1"
-  if [[ "${SELECTED_TOOLS[$tool_index]}" == "true" ]]; then
-    echo -e "${GREEN}[✓]${NC}"
-  else
-    echo -e "${RED}[ ]${NC}"
-  fi
-}
-
-# Count selected tools
-count_selected() {
-  local count=0
-  for ((i = 0; i < ${#SELECTED_TOOLS[@]}; i++)); do
-    if [[ "${SELECTED_TOOLS[i]}" == "true" ]]; then
-      ((count++))
-    fi
-  done
-  echo "$count"
-}
-
-# Display checkbox menu
-show_checkbox_menu() {
-  clear_screen
-  echo -e "${GREEN}Select tools to install (toggle with number + Enter):${NC}"
-  echo ""
-
-  # Display tools in two columns for better layout
-  local tool_count=${#TOOL_NAMES[@]}
-  local mid=$((tool_count / 2))
-
-  for ((i = 0; i < mid; i++)); do
-    local index1=$i
-    local index2=$((i + mid))
-
-    local checkbox1=$(get_checkbox "$index1")
-    local line1=$(printf "%s %2d) %-18s" "$checkbox1" "$((index1 + 1))" "${TOOL_NAMES[index1]}")
-
-    if [[ $index2 -lt $tool_count ]]; then
-      local checkbox2=$(get_checkbox "$index2")
-      local line2=$(printf "%s %2d) %-18s" "$checkbox2" "$((index2 + 1))" "${TOOL_NAMES[index2]}")
-      printf "  %s    %s\n" "$line1" "$line2"
-    else
-      printf "  %s\n" "$line1"
-    fi
-  done
-
-  # Handle odd number of tools
-  if [[ $((tool_count % 2)) -eq 1 ]]; then
-    local last_index=$((tool_count - 1))
-    local checkbox=$(get_checkbox "$last_index")
-    printf "  %s %2d) %-18s\n" "$checkbox" "$((last_index + 1))" "${TOOL_NAMES[last_index]}"
-  fi
-
-  local selected_count=$(count_selected)
-  echo ""
-  echo -e "${CYAN}Selected: ${selected_count}/${tool_count} tools${NC}"
-  echo ""
-  echo -e "${YELLOW}Commands:${NC}"
-  echo "  [number] - Toggle tool selection"
-  echo "  a        - Mark all tools"
-  echo "  n        - Unmark all tools"
-  echo "  i        - Install selected tools"
-  echo "  u        - Update system packages"
-  echo "  s        - Show selected tools"
-  echo "  q        - Quit"
-  echo ""
-}
-
-# Show selected tools
-show_selected() {
-  clear_screen
-  echo -e "${GREEN}Currently selected tools:${NC}"
-  echo ""
-
-  local has_selections=false
-  for ((i = 0; i < ${#TOOL_NAMES[@]}; i++)); do
-    if [[ "${SELECTED_TOOLS[i]}" == "true" ]]; then
-      printf "  ${GREEN}✓${NC} %-20s - %s\n" "${TOOL_NAMES[i]}" "${TOOL_DESCRIPTIONS[i]}"
-      has_selections=true
-    fi
-  done
-
-  if [[ "$has_selections" == false ]]; then
-    echo -e "${YELLOW}No tools selected.${NC}"
-  fi
-
-  echo ""
-  echo "Press Enter to continue..."
-  read -r
-}
-
-# Install a single tool
-install_tool() {
-  local tool_name="$1"
-  local tool_command="$2"
-  echo -e "${YELLOW}Installing $tool_name...${NC}"
-
-  eval "$tool_command"
-
-  if [[ $? -eq 0 ]]; then
-    echo -e "${GREEN}✓ $tool_name installed successfully!${NC}"
-  else
-    echo -e "${RED}✗ Failed to install $tool_name${NC}"
-  fi
-  echo ""
-}
-
-# Install selected tools
-install_selected() {
-  local selected_tools=()
-  local selected_commands=()
-
-  # Collect selected tools
-  for ((i = 0; i < ${#TOOL_NAMES[@]}; i++)); do
-    if [[ "${SELECTED_TOOLS[i]}" == "true" ]]; then
-      selected_tools+=("${TOOL_NAMES[i]}")
-      selected_commands+=("${TOOL_COMMANDS[i]}")
-    fi
-  done
-
-  if [[ ${#selected_tools[@]} -eq 0 ]]; then
-    echo -e "${RED}No tools selected for installation!${NC}"
-    echo "Press Enter to continue..."
-    read -r
-    return
-  fi
-
-  clear_screen
-  echo -e "${BLUE}Installing ${#selected_tools[@]} selected tools...${NC}"
-  echo ""
-
-  # Show what will be installed
-  echo -e "${YELLOW}Tools to be installed:${NC}"
-  for i in "${!selected_tools[@]}"; do
-    echo "  - ${selected_tools[i]}"
-  done
-  echo ""
-
-  echo ""
-  echo -e "${BLUE}Starting installation...${NC}"
-  echo ""
-
-  for i in "${!selected_tools[@]}"; do
-    install_tool "${selected_tools[i]}" "${selected_commands[i]}"
-  done
-
-  echo -e "${GREEN}Installation process completed!${NC}"
-  echo ""
-
-  # Ask if user wants to clear selections
-  echo -e "${YELLOW}Clear all selections? (y/N):${NC}"
-  read -r clear_confirm
-  if [[ $clear_confirm =~ ^[Yy]$ ]]; then
-    unmark_all
-    echo -e "${GREEN}Selections cleared.${NC}"
-  fi
-
-  echo "Press Enter to continue..."
-  read -r
-}
-
-# Validate input
-is_valid_tool_number() {
-  local input="$1"
-  local tool_count=${#TOOL_NAMES[@]}
-  [[ "$input" =~ ^[0-9]+$ ]] && [[ "$input" -ge 1 ]] && [[ "$input" -le "$tool_count" ]]
-}
-
-# Main interactive loop
-main() {
-  check_for_updates
+# Initialize the application
+initialize_app() {
+  # Check if running as root first
   check_root
+
+  # Check for updates (unless skipped)
+  if [[ "${SKIP_UPDATE_CHECK:-}" != "1" ]] && [[ "${1:-}" != "--no-update-check" ]]; then
+    check_for_updates
+  else
+    echo -e "${YELLOW}Skipping update check...${NC}"
+  fi
+
+  # Load applications from JSON
   load_apps
+
+  # Initialize tool selections
   init_selections
 
-  while true; do
-    show_checkbox_menu
-    echo -n "Enter command: "
-    read -r choice
+  # Initialization complete - go straight to menu
+}
 
-    case $choice in
-    [0-9] | [0-9][0-9])
-      if is_valid_tool_number "$choice"; then
-        local index=$((choice - 1))
-        toggle_selection "$index"
-        # Brief feedback
-        if [[ "${SELECTED_TOOLS[index]}" == "true" ]]; then
-          echo -e "${GREEN}✓ ${TOOL_NAMES[index]} selected${NC}"
-        else
-          echo -e "${YELLOW}${TOOL_NAMES[index]} deselected${NC}"
-        fi
-        sleep 0.5
-      else
-        echo -e "${RED}Invalid tool number!${NC}"
-        sleep 1
-      fi
-      ;;
-    a | A)
-      mark_all
-      echo -e "${GREEN}All tools selected!${NC}"
-      sleep 0.8
-      ;;
-    n | N)
-      unmark_all
-      echo -e "${YELLOW}All tools deselected!${NC}"
-      sleep 0.8
-      ;;
-    s | S)
-      show_selected
-      ;;
-    i | I)
-      install_selected
-      ;;
-    u | U)
-      clear_screen
-      update_system
-      echo "Press Enter to continue..."
-      read -r
-      ;;
-    q | Q)
-      echo -e "${GREEN}Goodbye!${NC}"
-      exit 0
-      ;;
-    *)
-      echo -e "${RED}Invalid command! Please try again.${NC}"
-      sleep 1
-      ;;
+# Main application entry point
+main() {
+  # Initialize everything
+  initialize_app "$@"
+
+  # Start the main menu loop
+  main_menu_loop
+}
+
+# Handle script interruption gracefully
+cleanup() {
+  echo ""
+  echo -e "${YELLOW}Installation interrupted by user.${NC}"
+  echo -e "${GREEN}Thank you for using CTF Tools!${NC}"
+  exit 130
+}
+
+# Set up signal handlers
+trap cleanup SIGINT SIGTERM
+
+# Error handling
+set -e
+handle_error() {
+  local line_number=$1
+  echo -e "${RED}An error occurred on line $line_number${NC}"
+  echo -e "${YELLOW}Please report this issue if it persists.${NC}"
+  exit 1
+}
+trap 'handle_error $LINENO' ERR
+
+# Dependency check
+check_dependencies() {
+  local missing_deps=()
+
+  # Check for required commands
+  command -v jq >/dev/null 2>&1 || missing_deps+=("jq")
+  command -v curl >/dev/null 2>&1 || missing_deps+=("curl")
+
+  if [[ ${#missing_deps[@]} -gt 0 ]]; then
+    echo -e "${RED}Missing required dependencies:${NC}"
+    for dep in "${missing_deps[@]}"; do
+      echo -e "  - $dep"
+    done
+    echo ""
+    echo -e "${YELLOW}Installing missing dependencies...${NC}"
+    sudo apt update && sudo apt install -y "${missing_deps[@]}"
+
+    if [[ $? -ne 0 ]]; then
+      echo -e "${RED}Failed to install dependencies. Please install them manually.${NC}"
+      exit 1
+    fi
+
+    echo -e "${GREEN}Dependencies installed successfully!${NC}"
+    sleep 1
+  fi
+}
+
+# Pre-flight checks
+preflight_checks() {
+  echo -e "${YELLOW}Performing pre-flight checks...${NC}"
+
+  # Check dependencies
+  check_dependencies
+
+  # Check if apps.json exists
+  if [[ ! -f "apps.json" ]]; then
+    echo -e "${RED}Error: apps.json not found!${NC}"
+    echo -e "${YELLOW}Make sure you're running this script from the correct directory.${NC}"
+    exit 1
+  fi
+
+  # Check if scripts directory exists
+  if [[ ! -d "scripts" ]]; then
+    echo -e "${RED}Error: scripts directory not found!${NC}"
+    echo -e "${YELLOW}Make sure you're running this script from the correct directory.${NC}"
+    exit 1
+  fi
+
+  echo -e "${GREEN}All checks passed!${NC}"
+  sleep 1
+}
+
+# Show startup banner
+show_banner() {
+  clear
+  echo -e "${BLUE}===============================================${NC}"
+  echo -e "${BLUE}          CTF Tools Interactive Installer     ${NC}"
+  echo -e "${BLUE}                   Version $CURRENT_VERSION                ${NC}"
+  echo -e "${BLUE}===============================================${NC}"
+  echo ""
+  echo -e "${GREEN}Welcome to the ultimate CTF tools installer!${NC}"
+  echo -e "${CYAN}This tool will help you set up a complete CTF environment.${NC}"
+  echo ""
+  sleep 0.5
+}
+
+# Show usage information
+show_usage() {
+  echo "CTF Tools Interactive Installer v$CURRENT_VERSION"
+  echo ""
+  echo "Usage: $0 [OPTIONS]"
+  echo ""
+  echo "Options:"
+  echo "  --no-update-check    Skip the automatic update check"
+  echo "  --help, -h          Show this help message"
+  echo ""
+  echo "Environment Variables:"
+  echo "  SKIP_UPDATE_CHECK=1  Skip the automatic update check"
+  echo ""
+}
+
+# Handle command line arguments
+handle_args() {
+  for arg in "$@"; do
+    case $arg in
+      --help|-h)
+        show_usage
+        exit 0
+        ;;
+      --no-update-check)
+        # This is handled in initialize_app
+        ;;
+      *)
+        echo -e "${RED}Unknown option: $arg${NC}"
+        echo "Use --help for usage information."
+        exit 1
+        ;;
     esac
   done
 }
 
-# Run the script
-main
+# Entry point with full initialization
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  # Handle command line arguments
+  handle_args "$@"
+
+  # Show banner
+  show_banner
+
+  # Run pre-flight checks
+  preflight_checks
+
+  # Start main application
+  main "$@"
+fi
