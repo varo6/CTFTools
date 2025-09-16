@@ -24,7 +24,7 @@ init_categories() {
   CATEGORY_TOOLS["forensics"]=""
 
   # Steganography Tools
-  CATEGORY_TOOLS["stego"]=""
+  CATEGORY_TOOLS["stego"]="steghide zsteg outguess stegsolve audacity sonic-visualiser foremost ghex"
 }
 
 # Show categories menu
