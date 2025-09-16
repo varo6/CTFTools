@@ -19,6 +19,11 @@ BIN_DIR="/usr/local/bin"
 CONFIG_DIR="/etc/autosetup"
 TEMP_DIR=$(mktemp -d)
 
+# Check if we need to re-run with sudo
+if [[ $EUID -ne 0 ]]; then
+    echo -e "${YELLOW}This script requires root privileges.${NC}"
+    exec sudo bash -c "$(curl -fsSL https://raw.githubusercontent.com/varo6/CTFTools/refs/heads/main/install.sh)"
+fi
 # Cleanup function
 cleanup() {
     echo -e "${YELLOW}Cleaning up temporary files...${NC}"
@@ -38,15 +43,6 @@ handle_error() {
     exit 1
 }
 trap 'handle_error $LINENO' ERR
-
-# Check if running as root, if not, re-run with sudo
-check_root() {
-    if [[ $EUID -ne 0 ]]; then
-        echo -e "${YELLOW}This script must be run as root. Re-running with sudo...${NC}"
-        curl -fsSL "$0" | sudo bash
-        exit 0
-    fi
-}
 
 # Show banner
 show_banner() {
@@ -251,10 +247,20 @@ verify_installation() {
     echo -e "${GREEN}Installation verification completed!${NC}"
 }
 
+# Handle script interruption gracefully
+handle_interrupt() {
+    echo ""
+    echo -e "${YELLOW}Installation interrupted by user.${NC}"
+    cleanup
+    exit 130
+}
+
+# Set up signal handlers
+trap handle_interrupt SIGINT SIGTERM
+
 # Main installation function
 main() {
     show_banner
-    check_root
     check_dependencies
     download_repo
     install_files
@@ -275,17 +281,6 @@ main() {
     echo -e "${BLUE}For more information, visit: https://trustlab.upct.es${NC}"
     echo ""
 }
-
-# Handle script interruption gracefully
-handle_interrupt() {
-    echo ""
-    echo -e "${YELLOW}Installation interrupted by user.${NC}"
-    cleanup
-    exit 130
-}
-
-# Set up signal handlers
-trap handle_interrupt SIGINT SIGTERM
 
 # Run main installation
 main "$@"

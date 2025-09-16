@@ -34,6 +34,10 @@ load_apps() {
   elif [[ -f "/etc/ctftools/apps.json" ]]; then
     json_file="/etc/ctftools/apps.json"
 
+  # Legacy location as last resort
+  elif [[ -f "/etc/autosetup/apps.json" ]]; then
+    json_file="/etc/autosetup/apps.json"
+
   # If we still can't find it, report the error
   else
     echo -e "${RED}Error: apps.json not found!${NC}"
