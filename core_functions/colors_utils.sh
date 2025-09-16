@@ -19,7 +19,7 @@ if [[ -f "$(dirname "${BASH_SOURCE[0]}")/../version" ]]; then
 elif [[ -f "/etc/autosetup/version" ]]; then
   CURRENT_VERSION=$(cat "/etc/autosetup/version")
 else
-  CURRENT_VERSION="1.0.6"  # Default version as fallback
+  CURRENT_VERSION="1.1"  # Default version as fallback
 fi
 REPO_URL_FOR_VERSION="https://raw.githubusercontent.com/varo6/CTFTools/refs/heads/main/"
 

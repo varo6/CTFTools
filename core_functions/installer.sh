@@ -9,14 +9,32 @@ install_tool() {
   local tool_command="$2"
   echo -e "${YELLOW}Installing $tool_name...${NC}"
 
-  eval "$tool_command"
+  # Capture current shell options
+  local old_errexit=$(set +o | grep errexit)
+  local old_pipefail=$(set +o | grep pipefail)
 
-  if [[ $? -eq 0 ]]; then
+  # Disable error exit and pipe failure
+  set +e
+  set +o pipefail
+
+  # Execute in subshell to prevent script termination
+  (
+    eval "$tool_command"
+  )
+  local exit_code=$?
+
+  # Restore shell options
+  eval "$old_errexit"
+  eval "$old_pipefail"
+
+  if [[ $exit_code -eq 0 ]]; then
     echo -e "${GREEN}✓ $tool_name installed successfully!${NC}"
   else
-    echo -e "${RED}✗ Failed to install $tool_name${NC}"
+    echo -e "${RED}✗ Failed to install $tool_name (exit code: $exit_code)${NC}"
   fi
   echo ""
+
+  return $exit_code
 }
 
 # Show selected tools
@@ -83,16 +101,35 @@ install_selected() {
   local successful_installs=0
   local failed_installs=0
 
+  # Disable exit on error for the installation loop to prevent script termination
+  local old_errexit=$(set +o | grep errexit)
+  local old_pipefail=$(set +o | grep pipefail)
+  set +e
+  set +o pipefail
+
   for i in "${!selected_tools[@]}"; do
     echo -e "${CYAN}[$((i + 1))/${#selected_tools[@]}]${NC}"
-    install_tool "${selected_tools[i]}" "${selected_commands[i]}"
+    echo -e "${YELLOW}About to install: ${selected_tools[i]}${NC}"
+    echo -e "${CYAN}Command: ${selected_commands[i]}${NC}"
 
-    if [[ $? -eq 0 ]]; then
+    install_tool "${selected_tools[i]}" "${selected_commands[i]}"
+    local install_result=$?
+
+    if [[ $install_result -eq 0 ]]; then
       ((successful_installs++))
+      echo -e "${GREEN}Tool ${selected_tools[i]} completed successfully${NC}"
     else
       ((failed_installs++))
+      echo -e "${RED}Tool ${selected_tools[i]} failed with exit code $install_result${NC}"
     fi
+
+    echo -e "${YELLOW}Continuing to next tool...${NC}"
+    echo ""
   done
+
+  # Restore previous shell options
+  eval "$old_errexit"
+  eval "$old_pipefail"
 
   # Installation summary
   print_separator

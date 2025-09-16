@@ -67,27 +67,21 @@ handle_main_menu_selection() {
   esac
 }
 
-# Categories menu (placeholder)
+# Categories menu - loads categories.sh
 show_categories_menu() {
-  clear_screen_with_header "Tool Categories"
+  # Source the categories script
+  local categories_script="$(dirname "${BASH_SOURCE[0]}")/categories.sh"
 
-  echo -e "${YELLOW}Browse tools by category:${NC}"
-  echo ""
-
-  echo -e "${BLUE}Available Categories:${NC}"
-  echo -e "  ${GREEN}1)${NC} Web Security Tools"
-  echo -e "  ${GREEN}2)${NC} Binary Analysis & Reverse Engineering"
-  echo -e "  ${GREEN}3)${NC} Network Security & Scanning"
-  echo -e "  ${GREEN}4)${NC} Cryptography Tools"
-  echo -e "  ${GREEN}5)${NC} Forensics Tools"
-  echo -e "  ${GREEN}6)${NC} Development Tools"
-  echo ""
-
-  echo -e "${RED}[Coming Soon]${NC} This feature is under development."
-  echo -e "${YELLOW}For now, please use 'Install Tools' to browse all available tools.${NC}"
-  echo ""
-
-  pause_for_user
+  if [[ -f "$categories_script" ]]; then
+    source "$categories_script"
+    categories_main_loop
+  else
+    clear_screen_with_header "Tool Categories"
+    echo -e "${RED}Error: Categories script not found!${NC}"
+    echo -e "${YELLOW}Expected location: $categories_script${NC}"
+    echo ""
+    pause_for_user
+  fi
 }
 
 # Beginner setup menu
@@ -184,7 +178,7 @@ show_tools_info() {
   echo ""
 
   # Define beginner tools
-  local beginner_tools=("edit Notepad en Terminal" "eza")
+  local beginner_tools=("edit" "eza")
 
   for ((i = 0; i < ${#TOOL_NAMES[@]}; i++)); do
     for beginner in "${beginner_tools[@]}"; do
@@ -216,7 +210,7 @@ install_beginner_tools() {
   echo ""
 
   # Define beginner tools
-  local beginner_tools=("edit Notepad en Terminal" "eza")
+  local beginner_tools=("edit" "eza")
 
   echo -e "${CYAN}Beginner tools to be installed:${NC}"
   for tool in "${beginner_tools[@]}"; do
@@ -224,26 +218,20 @@ install_beginner_tools() {
   done
   echo ""
 
-  echo -e "${YELLOW}Do you want to proceed? (y/N):${NC}"
-  read -r beginner_confirm
-
-  if [[ $beginner_confirm =~ ^[Yy]$ ]]; then
-    # Mark only beginner tools
-    unmark_all
-    for ((i = 0; i < ${#TOOL_NAMES[@]}; i++)); do
-      for beginner in "${beginner_tools[@]}"; do
-        if [[ "${TOOL_NAMES[i]}" == "$beginner" ]]; then
-          SELECTED_TOOLS[i]="true"
-          break
-        fi
-      done
+  # Mark only beginner tools
+  unmark_all
+  local tools_matched=0
+  for ((i = 0; i < ${#TOOL_NAMES[@]}; i++)); do
+    for beginner in "${beginner_tools[@]}"; do
+      if [[ "${TOOL_NAMES[i]}" == "$beginner" ]]; then
+        SELECTED_TOOLS[i]="true"
+        ((tools_matched++))
+        break
+      fi
     done
+  done
 
-    install_selected
-  else
-    show_info "Installation cancelled."
-    pause_for_user
-  fi
+  install_selected
 }
 # Install selected beginner tools
 install_selected_beginner_tools() {

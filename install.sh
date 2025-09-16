@@ -22,7 +22,7 @@ TEMP_DIR=$(mktemp -d)
 # Check if we need to re-run with sudo
 if [[ $EUID -ne 0 ]]; then
     echo -e "${YELLOW}This script requires root privileges.${NC}"
-    exec sudo bash -c "$(curl -fsSL https://raw.githubusercontent.com/varo6/CTFTools/refs/heads/main/install.sh)"
+    exec sudo "$0" "$@"
 fi
 # Cleanup function
 cleanup() {

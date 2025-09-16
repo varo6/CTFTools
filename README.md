@@ -153,4 +153,4 @@ This project is open source and available under standard open source licensing t
 
 **Made with ❤️ for the CTF and cybersecurity community**
 
-*Version 1.0.6 - Modular Edition*
+*Version 1.1 - Modular Edition*

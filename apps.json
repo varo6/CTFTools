@@ -50,13 +50,53 @@
     "command": "bash scripts/neovim.sh"
   },
   {
-    "name": "edit Notepad en Terminal",
+    "name": "stegsolve",
+    "description": "A Java-based tool for analyzing images to uncover hidden data through various steganographic techniques",
+    "command": "bash scripts/stegsolve.sh"
+  },
+  {
+    "name": "zsteg",
+    "description": "detects LSB steganography in PNG and BMP files",
+    "command": "bash scripts/zsteg.sh"
+  },
+  {
+    "name": "edit",
     "description": "Editor de texto para la terminal",
     "command": "bash scripts/edit.sh"
   },
   {
     "name": "eza",
     "description": "Modern replacement for ls with better features and colors",
-    "command": "sudo apt update && sudo apt install -y eza"
+    "command": "sudo apt install eza"
+  },
+  {
+    "name": "steghide",
+    "description": "A steganography tool for hiding and extracting data in image and audio files",
+    "command": "sudo apt install steghide -y"
+  },
+  {
+    "name": "outguess",
+    "description": "A universal steganographic tool that hides data in the redundant bits of data sources",
+    "command": "sudo apt install outguess -y"
+  },
+  {
+    "name": "audacity",
+    "description": "A free, open-source digital audio editor and recording application",
+    "command": "sudo apt install audacity -y"
+  },
+  {
+    "name": "foremost",
+    "description": "A forensic tool for recovering files based on their headers, footers, and internal data structures",
+    "command": "sudo apt install foremost -y"
+  },
+  {
+    "name": "ghex",
+    "description": "A hex editor for GNOME to view and edit binary files",
+    "command": "sudo apt install ghex -y"
+  },
+  {
+    "name": "sonic-visualiser",
+    "description": "A tool for viewing and analyzing the contents of audio files",
+    "command": "sudo apt install sonic-visualiser -y"
   }
 ]

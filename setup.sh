@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # CTF Tools Interactive Installer - Main Script
-# Version 1.0.6 - Modular Edition
+# Version 1.1 - Modular Edition
 #
 # This is the main entry point for the CTF Tools installer.
 # It loads all modular components and starts the main menu system.
@@ -105,15 +105,15 @@ cleanup() {
 # Set up signal handlers
 trap cleanup SIGINT SIGTERM
 
-# Error handling
-set -e
+# Error handling (disabled during installation to allow individual tool failures)
+# set -e
 handle_error() {
   local line_number=$1
   echo -e "${RED}An error occurred on line $line_number${NC}"
   echo -e "${YELLOW}Please report this issue if it persists.${NC}"
   exit 1
 }
-trap 'handle_error $LINENO' ERR
+# trap 'handle_error $LINENO' ERR
 
 # Dependency check
 check_dependencies() {
