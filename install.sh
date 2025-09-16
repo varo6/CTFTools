@@ -108,7 +108,7 @@ download_repo() {
 
 # Download repository as zip (fallback)
 download_zip() {
-    local zip_url="${REPO_URL}/archive/refs/heads/main.zip"
+    local zip_url="${REPO_URL}/archive/main.zip"
 
     if command -v curl >/dev/null 2>&1; then
         curl -fsSL "$zip_url" -o ctftools.zip
