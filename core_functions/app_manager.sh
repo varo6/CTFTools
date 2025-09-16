@@ -11,10 +11,37 @@ declare -a SELECTED_TOOLS
 
 # Load apps from JSON file
 load_apps() {
-  local json_file="apps.json"
+  # Try to find apps.json in multiple locations
+  local json_file
 
-  if [[ ! -f "$json_file" ]]; then
-    echo -e "${RED}Error: $json_file not found in the current directory!${NC}"
+  # First try the current directory
+  if [[ -f "apps.json" ]]; then
+    json_file="apps.json"
+
+  # Then try based on the script's location
+  elif [[ -f "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../apps.json" ]]; then
+    json_file="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../apps.json"
+
+  # Try the global installation locations
+  elif [[ -f "/opt/ctftools/apps.json" ]]; then
+    json_file="/opt/ctftools/apps.json"
+  elif [[ -f "/etc/ctftools/apps.json" ]]; then
+    json_file="/etc/ctftools/apps.json"
+
+  # Legacy location as last resort
+  elif [[ -f "/etc/autosetup/apps.json" ]]; then
+    json_file="/etc/autosetup/apps.json"
+
+  # If we still can't find it, report the error
+  else
+    echo -e "${RED}Error: apps.json not found!${NC}"
+    echo -e "${YELLOW}Attempted locations:${NC}"
+    echo -e " - Current directory: $(pwd)/apps.json"
+    echo -e " - Script directory: $(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../apps.json"
+    echo -e " - Global location 1: /opt/ctftools/apps.json"
+    echo -e " - Global location 2: /etc/ctftools/apps.json"
+    echo -e " - Legacy location: /etc/autosetup/apps.json"
+    echo -e "${YELLOW}Make sure CTF Tools is properly installed.${NC}"
     exit 1
   fi
 
@@ -27,7 +54,41 @@ load_apps() {
   # Parse JSON and populate arrays
   mapfile -t TOOL_NAMES < <(jq -r '.[].name' "$json_file")
   mapfile -t TOOL_DESCRIPTIONS < <(jq -r '.[].description' "$json_file")
-  mapfile -t TOOL_COMMANDS < <(jq -r '.[].command' "$json_file")
+  # Parse commands but replace any references to scripts/ with the correct path
+  mapfile -t RAW_COMMANDS < <(jq -r '.[].command' "$json_file")
+
+  # Determine scripts directory
+  local scripts_dir
+  if [[ -n "$SCRIPTS_DIR" ]]; then
+    # Use environment variable if set
+    scripts_dir="$SCRIPTS_DIR"
+  elif [[ -d "$(dirname "$json_file")/../scripts" ]]; then
+    # Try relative to JSON file
+    scripts_dir="$(dirname "$json_file")/../scripts"
+  elif [[ -d "/opt/ctftools/scripts" ]]; then
+    # Try global installation location
+    scripts_dir="/opt/ctftools/scripts"
+  elif [[ -d "/etc/ctftools/scripts" ]]; then
+    # Try config location
+    scripts_dir="/etc/ctftools/scripts"
+  elif [[ -d "/etc/autosetup/scripts" ]]; then
+    # Try legacy system location
+    scripts_dir="/etc/autosetup/scripts"
+  elif [[ -d "scripts" ]]; then
+    # Try current directory
+    scripts_dir="$(pwd)/scripts"
+  else
+    # Default to same directory
+    scripts_dir="scripts"
+  fi
+
+  # Replace script references with absolute paths
+  TOOL_COMMANDS=()
+  for cmd in "${RAW_COMMANDS[@]}"; do
+    # Replace "scripts/" with the full path to scripts directory
+    cmd="${cmd//scripts\//$scripts_dir\/}"
+    TOOL_COMMANDS+=("$cmd")
+  done
 
   if [[ ${#TOOL_NAMES[@]} -eq 0 ]]; then
     echo -e "${RED}Error: No tools found in $json_file${NC}"
@@ -35,6 +96,9 @@ load_apps() {
   fi
 
   echo -e "${GREEN}Loaded ${#TOOL_NAMES[@]} tools from $json_file${NC}"
+
+  # Export the json_file path so that other parts of the script can use it
+  JSON_FILE_PATH="$json_file"
 }
 
 # Initialize all tools as unselected

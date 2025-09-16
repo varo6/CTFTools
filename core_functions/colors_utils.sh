@@ -13,7 +13,14 @@ MAGENTA='\033[0;35m'
 NC='\033[0m' # No Color
 
 # Version information
-CURRENT_VERSION="1.0.6"
+# Try to find the version file in different locations
+if [[ -f "$(dirname "${BASH_SOURCE[0]}")/../version" ]]; then
+  CURRENT_VERSION=$(cat "$(dirname "${BASH_SOURCE[0]}")/../version")
+elif [[ -f "/etc/autosetup/version" ]]; then
+  CURRENT_VERSION=$(cat "/etc/autosetup/version")
+else
+  CURRENT_VERSION="1.0.6"  # Default version as fallback
+fi
 REPO_URL_FOR_VERSION="https://raw.githubusercontent.com/varo6/CTFTools/refs/heads/main/"
 
 # Clear screen and show header

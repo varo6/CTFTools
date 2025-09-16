@@ -8,15 +8,57 @@
 
 # Get the directory where this script is located
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Export for use in other scripts
+export SCRIPT_DIR
+
+# Check for core_functions directory in different locations
+CORE_FUNCTIONS_DIR="$SCRIPT_DIR/core_functions"
+if [[ ! -d "$CORE_FUNCTIONS_DIR" ]]; then
+  if [[ -d "/opt/ctftools/core_functions" ]]; then
+    CORE_FUNCTIONS_DIR="/opt/ctftools/core_functions"
+  elif [[ -d "/etc/ctftools/core_functions" ]]; then
+    CORE_FUNCTIONS_DIR="/etc/ctftools/core_functions"
+  elif [[ -d "/etc/autosetup/core_functions" ]]; then
+    CORE_FUNCTIONS_DIR="/etc/autosetup/core_functions"
+  fi
+fi
+export CORE_FUNCTIONS_DIR
+
+# Check for menu_system directory in different locations
+MENU_SYSTEM_DIR="$SCRIPT_DIR/menu_system"
+if [[ ! -d "$MENU_SYSTEM_DIR" ]]; then
+  if [[ -d "/opt/ctftools/menu_system" ]]; then
+    MENU_SYSTEM_DIR="/opt/ctftools/menu_system"
+  elif [[ -d "/etc/ctftools/menu_system" ]]; then
+    MENU_SYSTEM_DIR="/etc/ctftools/menu_system"
+  elif [[ -d "/etc/autosetup/menu_system" ]]; then
+    MENU_SYSTEM_DIR="/etc/autosetup/menu_system"
+  fi
+fi
+export MENU_SYSTEM_DIR
 
 # Source all core function modules
-source "$SCRIPT_DIR/core_functions/colors_utils.sh"
-source "$SCRIPT_DIR/core_functions/app_manager.sh"
-source "$SCRIPT_DIR/core_functions/installer.sh"
+if [[ ! -f "$CORE_FUNCTIONS_DIR/colors_utils.sh" || ! -f "$CORE_FUNCTIONS_DIR/app_manager.sh" || ! -f "$CORE_FUNCTIONS_DIR/installer.sh" ]]; then
+  echo -e "\033[0;31mError: Required core function modules not found!\033[0m"
+  echo -e "\033[1;33mPlease make sure CTF Tools is properly installed.\033[0m"
+  echo -e "Searched in: $CORE_FUNCTIONS_DIR"
+  exit 1
+fi
+
+source "$CORE_FUNCTIONS_DIR/colors_utils.sh"
+source "$CORE_FUNCTIONS_DIR/app_manager.sh"
+source "$CORE_FUNCTIONS_DIR/installer.sh"
 
 # Source all menu system modules
-source "$SCRIPT_DIR/menu_system/main_menu.sh"
-source "$SCRIPT_DIR/menu_system/install_menu.sh"
+if [[ ! -f "$MENU_SYSTEM_DIR/main_menu.sh" || ! -f "$MENU_SYSTEM_DIR/install_menu.sh" ]]; then
+  echo -e "\033[0;31mError: Required menu system modules not found!\033[0m"
+  echo -e "\033[1;33mPlease make sure CTF Tools is properly installed.\033[0m"
+  echo -e "Searched in: $MENU_SYSTEM_DIR"
+  exit 1
+fi
+
+source "$MENU_SYSTEM_DIR/main_menu.sh"
+source "$MENU_SYSTEM_DIR/install_menu.sh"
 
 # Initialize the application
 initialize_app() {
@@ -103,19 +145,45 @@ preflight_checks() {
   # Check dependencies
   check_dependencies
 
-  # Check if apps.json exists
-  if [[ ! -f "apps.json" ]]; then
-    echo -e "${RED}Error: apps.json not found!${NC}"
-    echo -e "${YELLOW}Make sure you're running this script from the correct directory.${NC}"
-    exit 1
+  # Get the directory where this script is located
+  local SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+  # Load version number from file
+  if [[ -f "$SCRIPT_DIR/version" ]]; then
+    CURRENT_VERSION=$(cat "$SCRIPT_DIR/version")
+  elif [[ -f "/opt/ctftools/version" ]]; then
+    CURRENT_VERSION=$(cat "/opt/ctftools/version")
+  elif [[ -f "/etc/ctftools/version" ]]; then
+    CURRENT_VERSION=$(cat "/etc/ctftools/version")
+  elif [[ -f "/etc/autosetup/version" ]]; then
+    CURRENT_VERSION=$(cat "/etc/autosetup/version")
+  else
+    CURRENT_VERSION="unknown"
   fi
 
   # Check if scripts directory exists
-  if [[ ! -d "scripts" ]]; then
+  local SCRIPTS_DIR="$SCRIPT_DIR/scripts"
+  # Also check system installation paths as fallback
+  if [[ ! -d "$SCRIPTS_DIR" ]]; then
+    if [[ -d "/opt/ctftools/scripts" ]]; then
+      SCRIPTS_DIR="/opt/ctftools/scripts"
+    elif [[ -d "/etc/ctftools/scripts" ]]; then
+      SCRIPTS_DIR="/etc/ctftools/scripts"
+    elif [[ -d "/etc/autosetup/scripts" ]]; then
+      SCRIPTS_DIR="/etc/autosetup/scripts"
+    fi
+  fi
+
+  if [[ ! -d "$SCRIPTS_DIR" ]]; then
     echo -e "${RED}Error: scripts directory not found!${NC}"
-    echo -e "${YELLOW}Make sure you're running this script from the correct directory.${NC}"
+    echo -e "${YELLOW}Attempted locations:${NC}"
+    echo -e " - Script directory: $SCRIPTS_DIR"
+    echo -e " - System locations: /opt/ctftools/scripts, /etc/ctftools/scripts, /etc/autosetup/scripts"
     exit 1
   fi
+
+  # Export the scripts directory path for use in other parts of the program
+  export SCRIPTS_DIR
 
   echo -e "${GREEN}All checks passed!${NC}"
   sleep 1
@@ -126,7 +194,7 @@ show_banner() {
   clear
   echo -e "${BLUE}===============================================${NC}"
   echo -e "${BLUE}          CTF Tools Interactive Installer     ${NC}"
-  echo -e "${BLUE}                   Version $CURRENT_VERSION                ${NC}"
+  echo -e "${BLUE}                   Version ${CURRENT_VERSION}                ${NC}"
   echo -e "${BLUE}===============================================${NC}"
   echo ""
   echo -e "${GREEN}Welcome to the ultimate CTF tools installer!${NC}"
@@ -137,7 +205,7 @@ show_banner() {
 
 # Show usage information
 show_usage() {
-  echo "CTF Tools Interactive Installer v$CURRENT_VERSION"
+  echo "CTF Tools Interactive Installer v${CURRENT_VERSION}"
   echo ""
   echo "Usage: $0 [OPTIONS]"
   echo ""
