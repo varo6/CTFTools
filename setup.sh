@@ -14,12 +14,14 @@ export SCRIPT_DIR
 # Check for core_functions directory in different locations
 CORE_FUNCTIONS_DIR="$SCRIPT_DIR/core_functions"
 if [[ ! -d "$CORE_FUNCTIONS_DIR" ]]; then
-  if [[ -d "/opt/ctftools/core_functions" ]]; then
+  if [[ -d "/opt/autosetup/core_functions" ]]; then
+    CORE_FUNCTIONS_DIR="/opt/autosetup/core_functions"
+  elif [[ -d "/etc/autosetup/core_functions" ]]; then
+    CORE_FUNCTIONS_DIR="/etc/autosetup/core_functions"
+  elif [[ -d "/opt/ctftools/core_functions" ]]; then
     CORE_FUNCTIONS_DIR="/opt/ctftools/core_functions"
   elif [[ -d "/etc/ctftools/core_functions" ]]; then
     CORE_FUNCTIONS_DIR="/etc/ctftools/core_functions"
-  elif [[ -d "/etc/autosetup/core_functions" ]]; then
-    CORE_FUNCTIONS_DIR="/etc/autosetup/core_functions"
   fi
 fi
 export CORE_FUNCTIONS_DIR
@@ -27,12 +29,14 @@ export CORE_FUNCTIONS_DIR
 # Check for menu_system directory in different locations
 MENU_SYSTEM_DIR="$SCRIPT_DIR/menu_system"
 if [[ ! -d "$MENU_SYSTEM_DIR" ]]; then
-  if [[ -d "/opt/ctftools/menu_system" ]]; then
+  if [[ -d "/opt/autosetup/menu_system" ]]; then
+    MENU_SYSTEM_DIR="/opt/autosetup/menu_system"
+  elif [[ -d "/etc/autosetup/menu_system" ]]; then
+    MENU_SYSTEM_DIR="/etc/autosetup/menu_system"
+  elif [[ -d "/opt/ctftools/menu_system" ]]; then
     MENU_SYSTEM_DIR="/opt/ctftools/menu_system"
   elif [[ -d "/etc/ctftools/menu_system" ]]; then
     MENU_SYSTEM_DIR="/etc/ctftools/menu_system"
-  elif [[ -d "/etc/autosetup/menu_system" ]]; then
-    MENU_SYSTEM_DIR="/etc/autosetup/menu_system"
   fi
 fi
 export MENU_SYSTEM_DIR
@@ -151,12 +155,14 @@ preflight_checks() {
   # Load version number from file
   if [[ -f "$SCRIPT_DIR/version" ]]; then
     CURRENT_VERSION=$(cat "$SCRIPT_DIR/version")
+  elif [[ -f "/opt/autosetup/version" ]]; then
+    CURRENT_VERSION=$(cat "/opt/autosetup/version")
+  elif [[ -f "/etc/autosetup/version" ]]; then
+    CURRENT_VERSION=$(cat "/etc/autosetup/version")
   elif [[ -f "/opt/ctftools/version" ]]; then
     CURRENT_VERSION=$(cat "/opt/ctftools/version")
   elif [[ -f "/etc/ctftools/version" ]]; then
     CURRENT_VERSION=$(cat "/etc/ctftools/version")
-  elif [[ -f "/etc/autosetup/version" ]]; then
-    CURRENT_VERSION=$(cat "/etc/autosetup/version")
   else
     CURRENT_VERSION="unknown"
   fi
@@ -165,12 +171,14 @@ preflight_checks() {
   local SCRIPTS_DIR="$SCRIPT_DIR/scripts"
   # Also check system installation paths as fallback
   if [[ ! -d "$SCRIPTS_DIR" ]]; then
-    if [[ -d "/opt/ctftools/scripts" ]]; then
+    if [[ -d "/opt/autosetup/scripts" ]]; then
+      SCRIPTS_DIR="/opt/autosetup/scripts"
+    elif [[ -d "/etc/autosetup/scripts" ]]; then
+      SCRIPTS_DIR="/etc/autosetup/scripts"
+    elif [[ -d "/opt/ctftools/scripts" ]]; then
       SCRIPTS_DIR="/opt/ctftools/scripts"
     elif [[ -d "/etc/ctftools/scripts" ]]; then
       SCRIPTS_DIR="/etc/ctftools/scripts"
-    elif [[ -d "/etc/autosetup/scripts" ]]; then
-      SCRIPTS_DIR="/etc/autosetup/scripts"
     fi
   fi
 
@@ -178,7 +186,7 @@ preflight_checks() {
     echo -e "${RED}Error: scripts directory not found!${NC}"
     echo -e "${YELLOW}Attempted locations:${NC}"
     echo -e " - Script directory: $SCRIPTS_DIR"
-    echo -e " - System locations: /opt/ctftools/scripts, /etc/ctftools/scripts, /etc/autosetup/scripts"
+    echo -e " - System locations: /opt/autosetup/scripts, /etc/autosetup/scripts, /opt/ctftools/scripts, /etc/ctftools/scripts"
     exit 1
   fi
 
@@ -193,7 +201,7 @@ preflight_checks() {
 show_banner() {
   clear
   echo -e "${BLUE}===============================================${NC}"
-  echo -e "${BLUE}          CTF Tools Interactive Installer     ${NC}"
+  echo -e "${BLUE}         CTF Tools (autosetup) Installer      ${NC}"
   echo -e "${BLUE}                   Version ${CURRENT_VERSION}                ${NC}"
   echo -e "${BLUE}===============================================${NC}"
   echo ""

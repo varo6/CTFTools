@@ -22,15 +22,17 @@ load_apps() {
   elif [[ -f "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../apps.json" ]]; then
     json_file="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../apps.json"
 
-  # Try the global installation locations
+  # Try the global installation locations (prioritize autosetup)
+  elif [[ -f "/opt/autosetup/apps.json" ]]; then
+    json_file="/opt/autosetup/apps.json"
+  elif [[ -f "/etc/autosetup/apps.json" ]]; then
+    json_file="/etc/autosetup/apps.json"
+
+  # Legacy locations as fallback
   elif [[ -f "/opt/ctftools/apps.json" ]]; then
     json_file="/opt/ctftools/apps.json"
   elif [[ -f "/etc/ctftools/apps.json" ]]; then
     json_file="/etc/ctftools/apps.json"
-
-  # Legacy location as last resort
-  elif [[ -f "/etc/autosetup/apps.json" ]]; then
-    json_file="/etc/autosetup/apps.json"
 
   # If we still can't find it, report the error
   else
@@ -38,9 +40,10 @@ load_apps() {
     echo -e "${YELLOW}Attempted locations:${NC}"
     echo -e " - Current directory: $(pwd)/apps.json"
     echo -e " - Script directory: $(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../apps.json"
-    echo -e " - Global location 1: /opt/ctftools/apps.json"
-    echo -e " - Global location 2: /etc/ctftools/apps.json"
-    echo -e " - Legacy location: /etc/autosetup/apps.json"
+    echo -e " - Global location 1: /opt/autosetup/apps.json"
+    echo -e " - Global location 2: /etc/autosetup/apps.json"
+    echo -e " - Legacy location 1: /opt/ctftools/apps.json"
+    echo -e " - Legacy location 2: /etc/ctftools/apps.json"
     echo -e "${YELLOW}Make sure CTF Tools is properly installed.${NC}"
     exit 1
   fi
@@ -65,15 +68,19 @@ load_apps() {
   elif [[ -d "$(dirname "$json_file")/../scripts" ]]; then
     # Try relative to JSON file
     scripts_dir="$(dirname "$json_file")/../scripts"
-  elif [[ -d "/opt/ctftools/scripts" ]]; then
+  elif [[ -d "/opt/autosetup/scripts" ]]; then
     # Try global installation location
+    scripts_dir="/opt/autosetup/scripts"
+  elif [[ -d "/etc/autosetup/scripts" ]]; then
+    # Try config location
+    scripts_dir="/etc/autosetup/scripts"
+  elif [[ -d "/opt/ctftools/scripts" ]]; then
+    # Try legacy location
     scripts_dir="/opt/ctftools/scripts"
   elif [[ -d "/etc/ctftools/scripts" ]]; then
-    # Try config location
+    # Try legacy config location
     scripts_dir="/etc/ctftools/scripts"
-  elif [[ -d "/etc/autosetup/scripts" ]]; then
-    # Try legacy system location
-    scripts_dir="/etc/autosetup/scripts"
+
   elif [[ -d "scripts" ]]; then
     # Try current directory
     scripts_dir="$(pwd)/scripts"
