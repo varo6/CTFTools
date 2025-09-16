@@ -16,11 +16,10 @@ INSTALL_DIR="/opt/ctftools"
 BIN_DIR="/usr/local/bin"
 CONFIG_DIR="/etc/ctftools"
 
-# Check if running as root
+# Check if running as root, if not, re-run with sudo
 if [[ $EUID -ne 0 ]]; then
-    echo -e "${RED}This script must be run as root (use sudo)${NC}"
-    echo -e "${YELLOW}Please run: sudo $0${NC}"
-    exit 1
+    echo -e "${YELLOW}This script must be run as root. Re-running:${NC}"
+    exec sudo "$0" "$@"
 fi
 
 # Show banner
