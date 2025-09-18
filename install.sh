@@ -22,7 +22,8 @@ TEMP_DIR=$(mktemp -d)
 # Check if we need to re-run with sudo
 if [[ $EUID -ne 0 ]]; then
     echo -e "${YELLOW}This script requires root privileges.${NC}"
-    sudo bash <(curl -fsSL https://raw.githubusercontent.com/varo6/CTFTools/main/install.sh)
+    sudo curl -fsSL https://raw.githubusercontent.com/varo6/CTFTools/main/install.sh | sudo bash
+    exit $?
 fi
 # Cleanup function
 cleanup() {
@@ -133,11 +134,27 @@ install_files() {
     # Remove old installations
     if [[ -d "$INSTALL_DIR" ]]; then
         echo -e "${YELLOW}Removing previous installation...${NC}"
-        rm -rf "$INSTALL_DIR"
+        # Change ownership first to avoid permission issues
+        chown -R root:root "$INSTALL_DIR" 2>/dev/null || true
+        # Remove any immutable attributes
+        chattr -R -i "$INSTALL_DIR" 2>/dev/null || true
+        # Force removal with proper error handling
+        rm -rf "$INSTALL_DIR" || {
+            echo -e "${YELLOW}Standard removal failed, trying force removal...${NC}"
+            find "$INSTALL_DIR" -type f -exec rm -f {} \; 2>/dev/null || true
+            find "$INSTALL_DIR" -type d -exec rmdir {} \; 2>/dev/null || true
+            rm -rf "$INSTALL_DIR" 2>/dev/null || true
+        }
     fi
 
     if [[ -d "$CONFIG_DIR" ]]; then
-        rm -rf "$CONFIG_DIR"
+        chown -R root:root "$CONFIG_DIR" 2>/dev/null || true
+        chattr -R -i "$CONFIG_DIR" 2>/dev/null || true
+        rm -rf "$CONFIG_DIR" || {
+            find "$CONFIG_DIR" -type f -exec rm -f {} \; 2>/dev/null || true
+            find "$CONFIG_DIR" -type d -exec rmdir {} \; 2>/dev/null || true
+            rm -rf "$CONFIG_DIR" 2>/dev/null || true
+        }
     fi
 
     # Create installation directories

@@ -98,5 +98,10 @@
     "name": "sonic-visualiser",
     "description": "A tool for viewing and analyzing the contents of audio files",
     "command": "sudo apt install sonic-visualiser -y"
+  },
+  {
+    "name": "uv",
+    "description": "better python package manager",
+    "command": "curl -LsSf https://astral.sh/uv/install.sh | sh"
   }
 ]
