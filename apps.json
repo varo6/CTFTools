@@ -103,5 +103,10 @@
     "name": "uv",
     "description": "better python package manager",
     "command": "curl -LsSf https://astral.sh/uv/install.sh | sh"
+  },
+  {
+    "name": "RsaCtfTool",
+    "description": "A tool for crypto-related CTFs",
+    "command": "bash scripts/RsaCtfTool.sh"
   }
 ]

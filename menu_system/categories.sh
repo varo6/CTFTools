@@ -18,7 +18,7 @@ init_categories() {
   CATEGORY_TOOLS["network"]="nmap"
 
   # Cryptography Tools
-  CATEGORY_TOOLS["crypto"]="hashcat"
+  CATEGORY_TOOLS["crypto"]="hashcat RsaCtfTool"
 
   # Forensics Tools
   CATEGORY_TOOLS["forensics"]=""
