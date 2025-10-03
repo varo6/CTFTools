@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # CTF Tools Interactive Installer - Main Script
-# Version 1.1 - Modular Edition
+# Version 1.2.1 - Modular Edition
 #
 # This is the main entry point for the CTF Tools installer.
 # It loads all modular components and starts the main menu system.
@@ -219,6 +219,7 @@ show_usage() {
   echo ""
   echo "Options:"
   echo "  --no-update-check    Skip the automatic update check"
+  echo "  --web         Start the web interface"
   echo "  --help, -h          Show this help message"
   echo ""
   echo "Environment Variables:"
@@ -232,6 +233,10 @@ handle_args() {
     case $arg in
       --help|-h)
         show_usage
+        exit 0
+        ;;
+      --web)
+        sudo docker run --rm -p 8080:8080 -it --ulimit nofile=65536:65536 securecodebox/bodgeit:latest
         exit 0
         ;;
       --no-update-check)

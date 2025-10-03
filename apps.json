@@ -108,5 +108,15 @@
     "name": "RsaCtfTool",
     "description": "A tool for crypto-related CTFs",
     "command": "bash scripts/RsaCtfTool.sh"
+  },
+  {
+    "name": "docker",
+    "description": "Contenerization tool",
+    "command": "sudo apt install -y docker.io"
+  },
+  {
+    "name": "bodgeit",
+    "description": "The bodgeit store",
+    "command": "bash scripts/bodgeit.sh"
   }
 ]

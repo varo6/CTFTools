@@ -9,7 +9,7 @@ declare -A CATEGORY_TOOLS
 # Initialize category mappings
 init_categories() {
   # Web Security Tools
-  CATEGORY_TOOLS["web"]="Burpsuite nmap"
+  CATEGORY_TOOLS["web"]="Burpsuite nmap docker bodgeit"
 
   # Binary Analysis & Reverse Engineering
   CATEGORY_TOOLS["binary"]="gdb w/ gef Ghidra ROPGadget checksec pwntools"
