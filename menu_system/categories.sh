@@ -9,7 +9,7 @@ declare -A CATEGORY_TOOLS
 # Initialize category mappings
 init_categories() {
   # Web Security Tools
-  CATEGORY_TOOLS["web"]="Burpsuite nmap docker bodgeit"
+  CATEGORY_TOOLS["web"]="Burpsuite nmap docker bodgeit encoder"
 
   # Binary Analysis & Reverse Engineering
   CATEGORY_TOOLS["binary"]="gdb w/ gef Ghidra ROPGadget checksec pwntools"
@@ -61,42 +61,42 @@ handle_category_selection() {
   local choice="$1"
 
   case $choice in
-    1)
-      install_category "web" "Web Security Tools"
-      ;;
-    2)
-      install_category "binary" "Binary Analysis & Reverse Engineering"
-      ;;
-    3)
-      install_category "network" "Network Security & Scanning"
-      ;;
-    4)
-      install_category "crypto" "Cryptography Tools"
-      ;;
-    5)
-      install_category "forensics" "Forensics Tools"
-      ;;
-    6)
-      install_category "stego" "Steganography Tools"
-      ;;
-    a|A)
-      install_all_categories
-      ;;
-    s|S)
-      show_category_details
-      ;;
-    b|B)
-      return 0
-      ;;
-    q|Q)
-      echo -e "${GREEN}Goodbye!${NC}"
-      exit 0
-      ;;
-    *)
-      show_error "Invalid option! Please try again."
-      sleep 0.3
-      show_categories_menu
-      ;;
+  1)
+    install_category "web" "Web Security Tools"
+    ;;
+  2)
+    install_category "binary" "Binary Analysis & Reverse Engineering"
+    ;;
+  3)
+    install_category "network" "Network Security & Scanning"
+    ;;
+  4)
+    install_category "crypto" "Cryptography Tools"
+    ;;
+  5)
+    install_category "forensics" "Forensics Tools"
+    ;;
+  6)
+    install_category "stego" "Steganography Tools"
+    ;;
+  a | A)
+    install_all_categories
+    ;;
+  s | S)
+    show_category_details
+    ;;
+  b | B)
+    return 0
+    ;;
+  q | Q)
+    echo -e "${GREEN}Goodbye!${NC}"
+    exit 0
+    ;;
+  *)
+    show_error "Invalid option! Please try again."
+    sleep 0.3
+    show_categories_menu
+    ;;
   esac
 
   show_categories_menu
@@ -120,7 +120,7 @@ install_category() {
   clear_screen_with_header "$category_name"
 
   # Convert tools string to array
-  read -ra tools_array <<< "$tools"
+  read -ra tools_array <<<"$tools"
 
   echo -e "${GREEN}Tools in this category:${NC}"
   echo ""
@@ -185,7 +185,7 @@ install_all_categories() {
   for category in "web" "binary" "network" "crypto" "forensics" "stego"; do
     local tools="${CATEGORY_TOOLS[$category]}"
     if [[ -n "$tools" ]]; then
-      read -ra tools_array <<< "$tools"
+      read -ra tools_array <<<"$tools"
       echo -e "${BLUE}${category^} category:${NC} ${#tools_array[@]} tools"
       total_tools=$((total_tools + ${#tools_array[@]}))
     fi
@@ -207,7 +207,7 @@ install_all_categories() {
     for category in "web" "binary" "network" "crypto" "forensics" "stego"; do
       local tools="${CATEGORY_TOOLS[$category]}"
       if [[ -n "$tools" ]]; then
-        read -ra tools_array <<< "$tools"
+        read -ra tools_array <<<"$tools"
         for tool in "${tools_array[@]}"; do
           for ((i = 0; i < ${#TOOL_NAMES[@]}; i++)); do
             if [[ "${TOOL_NAMES[i]}" == "$tool" ]]; then
@@ -246,13 +246,13 @@ show_category_details() {
   local categories=("web:Web Security Tools" "binary:Binary Analysis & Reverse Engineering" "network:Network Security & Scanning" "crypto:Cryptography Tools" "forensics:Forensics Tools" "stego:Steganography Tools")
 
   for category_info in "${categories[@]}"; do
-    IFS=':' read -r key name <<< "$category_info"
+    IFS=':' read -r key name <<<"$category_info"
     local tools="${CATEGORY_TOOLS[$key]}"
 
     echo -e "${BLUE}$name:${NC}"
 
     if [[ -n "$tools" ]]; then
-      read -ra tools_array <<< "$tools"
+      read -ra tools_array <<<"$tools"
       for tool in "${tools_array[@]}"; do
         for ((i = 0; i < ${#TOOL_NAMES[@]}; i++)); do
           if [[ "${TOOL_NAMES[i]}" == "$tool" ]]; then
