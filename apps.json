@@ -118,5 +118,10 @@
     "name": "bodgeit",
     "description": "The bodgeit store",
     "command": "bash scripts/bodgeit.sh"
+  },
+  {
+    "name":"encoder",
+    "description": "encoder for web security",
+    "command":"cp scripts/encoder.py /home/$USER"
   }
 ]
