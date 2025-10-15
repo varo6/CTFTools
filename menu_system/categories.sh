@@ -26,8 +26,6 @@ init_categories() {
   # Steganography Tools
   CATEGORY_TOOLS["stego"]="steghide zsteg outguess stegsolve audacity sonic-visualiser foremost ghex"
 
-  # Binary Exploitation Tools
-  CATEGORY_TOOLS["binexp"]="ghex ROPGadget Ghidra gdbgef radare2 pwntools"
 }
 
 # Show categories menu
@@ -39,12 +37,11 @@ show_categories_menu() {
 
   echo -e "${BLUE}Available Categories:${NC}"
   echo -e "  ${GREEN}1)${NC} Web Security Tools"
-  echo -e "  ${GREEN}2)${NC} Binary Analysis & Reverse Engineering"
+  echo -e "  ${GREEN}2)${NC} Binary Exploitation tools"
   echo -e "  ${GREEN}3)${NC} Network Security & Scanning"
   echo -e "  ${GREEN}4)${NC} Cryptography Tools"
   echo -e "  ${GREEN}5)${NC} Forensics Tools"
   echo -e "  ${GREEN}6)${NC} Steganography Tools"
-  echo -e "  ${GREEN}7)${NC} Binary Exploitation Tools"
   echo ""
 
   echo -e "${YELLOW}Options:${NC}"
@@ -69,7 +66,7 @@ handle_category_selection() {
     install_category "web" "Web Security Tools"
     ;;
   2)
-    install_category "binary" "Binary Analysis & Reverse Engineering"
+    install_category "binary" "Binary Exploitation Tools"
     ;;
   3)
     install_category "network" "Network Security & Scanning"
@@ -82,9 +79,6 @@ handle_category_selection() {
     ;;
   6)
     install_category "stego" "Steganography Tools"
-    ;;
-  7)
-    install_category "binexp" "Binary Exploitation Tools"
     ;;
   a | A)
     install_all_categories

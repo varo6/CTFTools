@@ -131,7 +131,7 @@ show_quick_selection_menu() {
 # Select essential tools
 select_essential_tools() {
   unmark_all
-  local essential_tools=("gdb w/ gef" "pwntools" "nmap" "checksec" "Ghidra")
+  local essential_tools=("gdbgef" "pwntools" "nmap" "checksec" "Ghidra")
 
   for ((i = 0; i < ${#TOOL_NAMES[@]}; i++)); do
     for essential in "${essential_tools[@]}"; do
@@ -149,7 +149,7 @@ select_essential_tools() {
 # Select binary analysis tools
 select_binary_tools() {
   unmark_all
-  local binary_tools=("gdb w/ gef" "Ghidra" "ROPGadget" "checksec")
+  local binary_tools=("gdbgef" "Ghidra" "ROPGadget" "checksec")
 
   for ((i = 0; i < ${#TOOL_NAMES[@]}; i++)); do
     for binary in "${binary_tools[@]}"; do
