@@ -1,8 +1,4 @@
-git clone https://github.com/pwndbg/pwndbg
-
-cd pwndbg
-
-./setup.sh
+curl -qsL 'https://install.pwndbg.re' | sh -s -- -t pwndbg-gdb
 
 wget -O ~/.gdbinit-gef.py https://gef.blah.cat/py
 

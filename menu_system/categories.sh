@@ -12,7 +12,7 @@ init_categories() {
   CATEGORY_TOOLS["web"]="Burpsuite nmap docker bodgeit encoder"
 
   # Binary Analysis & Reverse Engineering
-  CATEGORY_TOOLS["binary"]="gdb w/ gef Ghidra ROPGadget checksec pwntools"
+  CATEGORY_TOOLS["binary"]="gdbgef Ghidra ROPGadget checksec ghex pwntools radare2"
 
   # Network Security & Scanning
   CATEGORY_TOOLS["network"]="nmap"
