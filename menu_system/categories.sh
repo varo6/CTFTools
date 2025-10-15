@@ -25,6 +25,9 @@ init_categories() {
 
   # Steganography Tools
   CATEGORY_TOOLS["stego"]="steghide zsteg outguess stegsolve audacity sonic-visualiser foremost ghex"
+
+  # Binary Exploitation Tools
+  CATEGORY_TOOLS["binexp"]="ghex ROPGadget Ghidra gdbgef radare2 pwntools"
 }
 
 # Show categories menu
@@ -41,6 +44,7 @@ show_categories_menu() {
   echo -e "  ${GREEN}4)${NC} Cryptography Tools"
   echo -e "  ${GREEN}5)${NC} Forensics Tools"
   echo -e "  ${GREEN}6)${NC} Steganography Tools"
+  echo -e "  ${GREEN}7)${NC} Binary Exploitation Tools"
   echo ""
 
   echo -e "${YELLOW}Options:${NC}"
@@ -78,6 +82,9 @@ handle_category_selection() {
     ;;
   6)
     install_category "stego" "Steganography Tools"
+    ;;
+  7)
+    install_category "binexp" "Binary Exploitation Tools"
     ;;
   a | A)
     install_all_categories
@@ -182,7 +189,7 @@ install_all_categories() {
 
   local total_tools=0
 
-  for category in "web" "binary" "network" "crypto" "forensics" "stego"; do
+  for category in "web" "binary" "network" "crypto" "forensics" "stego" "binexp"; do
     local tools="${CATEGORY_TOOLS[$category]}"
     if [[ -n "$tools" ]]; then
       read -ra tools_array <<<"$tools"
@@ -204,7 +211,7 @@ install_all_categories() {
     unmark_all
     local tools_selected=0
 
-    for category in "web" "binary" "network" "crypto" "forensics" "stego"; do
+    for category in "web" "binary" "network" "crypto" "forensics" "stego" "binexp"; do
       local tools="${CATEGORY_TOOLS[$category]}"
       if [[ -n "$tools" ]]; then
         read -ra tools_array <<<"$tools"
@@ -243,7 +250,7 @@ show_category_details() {
   echo -e "${GREEN}Detailed information about tool categories:${NC}"
   echo ""
 
-  local categories=("web:Web Security Tools" "binary:Binary Analysis & Reverse Engineering" "network:Network Security & Scanning" "crypto:Cryptography Tools" "forensics:Forensics Tools" "stego:Steganography Tools")
+  local categories=("web:Web Security Tools" "binary:Binary Analysis & Reverse Engineering" "network:Network Security & Scanning" "crypto:Cryptography Tools" "forensics:Forensics Tools" "stego:Steganography Tools" "binexp:Binary Exploitation Tools")
 
   for category_info in "${categories[@]}"; do
     IFS=':' read -r key name <<<"$category_info"

@@ -15,7 +15,7 @@
     "command": "sudo apt install -y hashcat"
   },
   {
-    "name": "gdb w/ gef",
+    "name": "gdbgef",
     "description": "A debugger extension that enhances GNU Debugger with advanced exploit development capabilities and visualization tools for binary analysis.",
     "command": "bash scripts/pwndbg.sh"
   },
@@ -120,8 +120,13 @@
     "command": "bash scripts/bodgeit.sh"
   },
   {
-    "name":"encoder",
+    "name": "radare2",
+    "description": "An open-source framework for reverse engineering and analyzing binaries, providing a suite of tools for disassembly, debugging, and binary patching.",
+    "command": "bash scripts/radare2.sh"
+  },
+  {
+    "name": "encoder",
     "description": "encoder for web security",
-    "command":"cp scripts/encoder.py /home/$USER"
+    "command": "cp scripts/encoder.py /home/$USER"
   }
 ]
